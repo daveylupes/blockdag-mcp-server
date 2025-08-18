@@ -1,0 +1,27 @@
+{
+  "name": "mcp-blockdag",
+  "version": "0.1.0",
+  "description": "MCP server for EVM-compatible BlockDAG node",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    "viem": "^2.7.0",
+    "zod": "^3.22.4",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "tsx": "^4.6.0",
+    "@types/node": "^20.10.0"
+  },
+  "keywords": ["mcp", "blockdag", "evm", "rpc"],
+  "author": "",
+  "license": "MIT"
+}
