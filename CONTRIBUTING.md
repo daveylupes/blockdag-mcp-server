@@ -1,6 +1,6 @@
 # Contributing to BlockDAG MCP Server
 
-Thank you for your interest in contributing to the BlockDAG MCP Server! This document provides guidelines and information for contributors.
+Thank you for your interest in contributing! This project thrives on community contributions, whether you're fixing bugs, adding features, or improving documentation.
 
 ## Table of Contents
 
@@ -10,26 +10,25 @@ Thank you for your interest in contributing to the BlockDAG MCP Server! This doc
 - [Making Changes](#making-changes)
 - [Testing](#testing)
 - [Submitting Changes](#submitting-changes)
-- [Code Review Process](#code-review-process)
+- [Getting Help](#getting-help)
 
 ## Code of Conduct
 
-This project is committed to providing a welcoming and inclusive environment for all contributors. Please be respectful and considerate in all interactions.
+Be respectful and considerate. We're all here to build something useful together.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js 20 or higher
-- npm or yarn
+- Node.js 20+
 - Git
-- Basic knowledge of TypeScript and blockchain concepts
+- Basic TypeScript knowledge
+- Understanding of blockchain concepts (helpful but not required)
 
 ### Development Setup
 
-1. **Fork the repository**
+1. **Fork and clone**
    ```bash
-   # Fork on GitHub, then clone your fork
    git clone https://github.com/YOUR_USERNAME/blockdag-mcp-server.git
    cd blockdag-mcp-server
    ```
@@ -42,218 +41,221 @@ This project is committed to providing a welcoming and inclusive environment for
 3. **Set up environment**
    ```bash
    cp env.example .env
-   # Edit .env with your BlockDAG RPC details
+   # Edit .env with BlockDAG RPC details
    ```
 
 4. **Verify setup**
    ```bash
-   npm run type-check
    npm run build
+   npm test
    ```
 
 ## Making Changes
 
-### Code Style Guidelines
+### Code Style
 
-- **TypeScript**: Use strict mode and follow TypeScript best practices
-- **Error Handling**: Always use the `handleError` function for consistent error responses
-- **Logging**: Add appropriate console.error logs for debugging
-- **Validation**: Use Zod schemas for all input validation
-- **Documentation**: Add JSDoc comments for public functions
+- Use TypeScript strict mode
+- Follow existing patterns for consistency
+- Add comprehensive error handling
+- Include helpful log messages
+- Write clear, descriptive variable names
 
-### File Structure
+### File Organization
 
 ```
 src/
-├── index.ts          # Main server entry point
+├── index.ts          # Main server and all tool implementations
 ├── chain.ts          # BlockDAG chain configuration
-├── types.ts          # Shared types and utilities
-└── tools/            # Individual tool implementations (if needed)
+└── types.ts          # Shared types and utilities
 ```
 
-### Adding New Tools
+### Adding a New Tool
 
-1. **Define the tool** in the `tools` array in `src/index.ts`
-2. **Add input validation** using Zod schemas
-3. **Implement the handler** function with proper error handling
-4. **Add logging** for debugging and monitoring
+1. **Add tool definition** to the `tools` array in `src/index.ts`
+2. **Create input schema** using Zod
+3. **Add switch case** for routing
+4. **Implement handler function** with proper error handling
 5. **Update documentation** in README.md
+6. **Test thoroughly**
 
-Example tool addition:
+Example:
 
 ```typescript
-// In tools array
+// 1. Tool definition
 {
-  name: 'new_tool',
-  description: 'Description of what this tool does',
+  name: 'my_new_tool',
+  description: 'What this tool does',
   inputSchema: z.object({
-    // Define input validation
+    param: z.string(),
   }),
 }
 
-// In switch statement
-case 'new_tool':
-  result = await handleNewTool(client, validatedArgs);
+// 2. Switch case
+case 'my_new_tool':
+  result = await handleMyNewTool(client, validatedArgs);
   break;
 
-// Handler function
-async function handleNewTool(client: any, args: any) {
+// 3. Handler function
+async function handleMyNewTool(client: any, args: { param: string }) {
   try {
-    console.error('[MCP] Executing new tool...');
+    console.error('[MCP] Executing my_new_tool...');
     // Implementation
     return result;
   } catch (error) {
-    console.error('[MCP] New tool failed:', error);
-    throw new Error(`Failed to execute new tool: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    console.error('[MCP] my_new_tool failed:', error);
+    throw new Error(`Failed: ${error instanceof Error ? error.message : 'Unknown'}`);
   }
 }
 ```
 
 ## Testing
 
-### Manual Testing
+### Run Tests
 
-1. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-2. **Use MCP Inspector**
-   ```bash
-   npm install -g @modelcontextprotocol/inspector
-   mcp-inspector
-   ```
-
-3. **Test each tool** with various inputs and edge cases
-
-### Automated Testing
-
-Run the test suite:
 ```bash
 npm test
 ```
 
-### Testing Checklist
+### Manual Testing
 
-- [ ] Tool responds correctly to valid inputs
-- [ ] Tool handles invalid inputs gracefully
-- [ ] Error messages are clear and helpful
-- [ ] Logging provides useful debugging information
-- [ ] Performance is acceptable for expected use cases
+```bash
+# Start dev server
+npm run dev
+
+# In another terminal, use MCP Inspector
+mcp-inspector
+```
+
+### What to Test
+
+- ✅ Valid inputs work correctly
+- ✅ Invalid inputs show clear error messages
+- ✅ Edge cases are handled
+- ✅ Error logging is helpful
+- ✅ Performance is acceptable
 
 ## Submitting Changes
 
-### Commit Guidelines
+### Commit Messages
 
-Use conventional commit messages:
+Use conventional commits:
 
 ```
-type(scope): description
+type(scope): brief description
 
-[optional body]
-
-[optional footer]
+type: feat, fix, docs, style, refactor, test, chore
 ```
-
-Types:
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
 
 Examples:
 ```
-feat(tools): add new_block_tool for querying block details
-fix(error-handling): improve error messages for invalid addresses
-docs(readme): add troubleshooting section
+feat(tools): add gas estimation tool
+fix(error): improve validation error messages
+docs(readme): add usage examples
 ```
 
 ### Pull Request Process
 
 1. **Create a feature branch**
    ```bash
-   git checkout -b feature/your-feature-name
+   git checkout -b feature/your-feature
    ```
 
-2. **Make your changes** following the guidelines above
+2. **Make your changes** following guidelines
 
-3. **Test your changes** thoroughly
-
-4. **Update documentation** if needed
-
-5. **Commit your changes** with clear commit messages
-
-6. **Push to your fork**
+3. **Test thoroughly**
    ```bash
-   git push origin feature/your-feature-name
+   npm run build
+   npm test
+   npm run type-check
    ```
 
-7. **Create a Pull Request** with:
+4. **Commit with clear messages**
+
+5. **Push to your fork**
+   ```bash
+   git push origin feature/your-feature
+   ```
+
+6. **Open a Pull Request** with:
    - Clear description of changes
-   - Link to any related issues
-   - Screenshots or examples if applicable
-   - Testing checklist completed
+   - Why the change is needed
+   - How you tested it
+   - Any breaking changes
 
-### Pull Request Template
+## Types of Contributions
 
-```markdown
-## Description
-Brief description of the changes made.
+### Bug Fixes
+Found a bug? Please open an issue or submit a fix!
 
-## Type of Change
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Documentation update
-- [ ] Code refactoring
-- [ ] Other (please describe)
+### New Tools
+Ideas for new blockchain queries? Implement and submit a PR!
 
-## Testing
-- [ ] Manual testing completed
-- [ ] MCP Inspector testing completed
-- [ ] Error scenarios tested
-- [ ] Performance impact considered
+### Documentation
+Improve explanations, add examples, fix typos - all welcome!
 
-## Checklist
-- [ ] Code follows style guidelines
-- [ ] Error handling implemented
-- [ ] Logging added where appropriate
-- [ ] Documentation updated
-- [ ] No breaking changes introduced
+### Performance
+Optimization ideas? Share them or implement them!
+
+### Testing
+Add more tests, improve test coverage, better test utilities!
+
+## Development Guidelines
+
+### Error Handling
+Always use try-catch and the `handleError` function:
+
+```typescript
+try {
+  // Your code
+} catch (error) {
+  console.error('[MCP] Operation failed:', error);
+  throw new Error(`Clear message: ${error.message}`);
+}
 ```
 
-## Code Review Process
+### Logging
+Add helpful logs for debugging:
 
-1. **Automated Checks**: All PRs must pass CI checks
-2. **Review**: At least one maintainer must approve
-3. **Testing**: Changes must be tested before merging
-4. **Documentation**: Documentation must be updated if needed
+```typescript
+console.error('[MCP] Starting operation...');
+console.error('[MCP] Operation completed successfully');
+```
 
-### Review Criteria
+### Input Validation
+Use Zod schemas for all inputs:
 
-- **Functionality**: Does the code work as intended?
-- **Error Handling**: Are errors handled appropriately?
-- **Performance**: Is the performance acceptable?
-- **Security**: Are there any security concerns?
-- **Maintainability**: Is the code maintainable and readable?
-- **Documentation**: Is the documentation clear and complete?
+```typescript
+const schema = z.object({
+  address: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+});
+```
+
+### Type Safety
+Leverage TypeScript:
+
+```typescript
+// Use proper types, avoid 'any' where possible
+const result: BlockData = await client.getBlock();
+```
 
 ## Getting Help
 
-If you need help with your contribution:
-
-1. **Check existing issues** for similar problems
-2. **Search documentation** for relevant information
-3. **Ask in discussions** or create an issue
-4. **Join our community** channels
+- **Check existing issues** for similar problems
+- **Read the documentation** in `docs/`
+- **Ask in discussions** or open an issue
+- **Review closed PRs** for examples
 
 ## Recognition
 
-Contributors will be recognized in:
-- Repository contributors list
+Contributors are recognized in:
+- GitHub contributors list
 - Release notes
-- Documentation acknowledgments
+- Documentation
 
-Thank you for contributing to the BlockDAG MCP Server!
+## Questions?
+
+Feel free to open an issue or discussion. We're here to help!
+
+---
+
+**Thank you for contributing to BlockDAG MCP Server!** 🚀
