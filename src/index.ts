@@ -596,9 +596,10 @@ async function handleGetTransactionHistory(
         const transferEventTopic = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
         
         // Get logs for ERC20 transfers
+        // Fix: Use original fromBlock/toBlock values to maintain dynamic behavior with 'latest'
         const logs = await client.getLogs({
-          fromBlock: actualFromBlock,
-          toBlock: actualToBlock,
+          fromBlock: fromBlock || '0x0',
+          toBlock: toBlock || 'latest',
           topics: [
             transferEventTopic,
             // Filter for transfers from or to the address
@@ -679,9 +680,11 @@ async function handleGetNetworkStats(client: any, args: { blocks?: number }) {
     // Get current gas price
     let currentGasPrice = BigInt(0);
     try {
-      currentGasPrice = await client.request({
+      const gasPriceHex = await client.request({
         method: 'eth_gasPrice',
-      }) as bigint;
+      }) as string;
+      // Fix: Parse hex string to BigInt instead of assuming bigint return type
+      currentGasPrice = BigInt(gasPriceHex);
     } catch {
       console.error('[MCP] Could not fetch current gas price');
     }
@@ -689,9 +692,16 @@ async function handleGetNetworkStats(client: any, args: { blocks?: number }) {
     // Analyze recent blocks
     let previousTimestamp: bigint | undefined;
     
-    for (let i = 0; i < blocksToAnalyze && latestBlock - BigInt(i) >= BigInt(0); i++) {
+    // Fix: Ensure we don't iterate beyond block 0
+    const startBlock = latestBlock - BigInt(blocksToAnalyze - 1);
+    const actualStartBlock = startBlock < BigInt(0) ? BigInt(0) : startBlock;
+    
+    for (let i = 0; i < blocksToAnalyze; i++) {
       try {
         const blockNum = latestBlock - BigInt(i);
+        // Fix: Skip if block number would be negative
+        if (blockNum < BigInt(0)) break;
+        
         const block = await client.getBlock({
           blockNumber: blockNum,
           includeTransactions: true,
@@ -706,7 +716,7 @@ async function handleGetNetworkStats(client: any, args: { blocks?: number }) {
             blockTimes.push(timeDiff);
           }
         }
-        previousTimestamp = block.timestamp;
+        previousTimestamp = block.timestamp || undefined;
         
         // Transaction count
         const txCount = Array.isArray(block.transactions) ? block.transactions.length : 0;
@@ -765,10 +775,16 @@ async function handleGetNetworkStats(client: any, args: { blocks?: number }) {
     let avgGasPrice = BigInt(0);
     
     if (gasPrices.length > 0) {
-      gasPrices.sort((a, b) => (a < b ? -1 : 1));
+      // Fix: Proper BigInt sorting comparator that handles equality
+      gasPrices.sort((a, b) => {
+        if (a < b) return -1;
+        if (a > b) return 1;
+        return 0;
+      });
       minGasPrice = gasPrices[0] || BigInt(0);
       maxGasPrice = gasPrices[gasPrices.length - 1] || BigInt(0);
       const totalGasPrice = gasPrices.reduce((sum, gp) => sum + gp, BigInt(0));
+      // Fix: Safe division with proper BigInt handling
       avgGasPrice = totalGasPrice / BigInt(gasPrices.length);
     }
     

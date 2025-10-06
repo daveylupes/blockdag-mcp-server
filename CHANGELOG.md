@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive logging system
 - Connection health checks on startup
 
+### Fixed
+- Gas price sorting comparator in `get_network_stats` now properly handles BigInt equality
+- Fixed potential division by zero error in gas price statistics calculation
+- Corrected `eth_gasPrice` RPC call to properly parse hex string response to BigInt
+- Prevented negative block number iteration in network statistics analysis
+- Fixed dynamic block tag handling in `get_transaction_history` to maintain 'latest' behavior
+- Added proper TypeScript type safety for potentially undefined values
+
 ### Documentation
 - Feature documentation in `docs/features/`
 - User guides in `docs/guides/`
